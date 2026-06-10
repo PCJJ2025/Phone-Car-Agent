@@ -1,8 +1,16 @@
+
 1.规划
+
+
+
 <img width="680" height="1464" alt="8E8AF0F4-A064-4A1B-9C11-7160FA21637B" src="https://github.com/user-attachments/assets/1dbb18ea-f822-47f3-948c-720d427e4f56" />
+
 2.生成随机码
 <img width="714" height="1510" alt="A491A246-9613-46B3-A166-24E93FF395CE" src="https://github.com/user-attachments/assets/20509b00-bd00-4ed7-b32b-2d713fae434b" />
+
 3.1车机端，输入随机码，初始点
+
+
 <img width="1080" height="2400" alt="553e3f978bb03e221166ef697acddf51" src="https://github.com/user-attachments/assets/dcc6a542-449d-44a8-a267-d40a7f124321" />
 3.2 到达地点 2
 <img width="1080" height="2400" alt="69407f1f63c8d8f62759607d407faf08" src="https://github.com/user-attachments/assets/e83f5616-509f-4147-b815-007867e8ea3d" />
