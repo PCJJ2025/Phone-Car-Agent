@@ -46,6 +46,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, ItineraryActivity::class.java))
         }
 
+        findViewById<Button>(R.id.btnCarMode).setOnClickListener {
+            startActivity(Intent(this, CarReceiverActivity::class.java))
+        }
+
         btnStart.setOnClickListener {
             if (!Settings.canDrawOverlays(this)) {
                 tvStatus.text = "请先开启悬浮窗权限"

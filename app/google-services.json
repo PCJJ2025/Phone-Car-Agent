@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "752223337390",
+    "project_id": "phone-car",
+    "storage_bucket": "phone-car.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:752223337390:android:0eb6a5b13bba3df23b263f",
+        "android_client_info": {
+          "package_name": "com.floatagent"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7mYDrJOK-JdLGC1TrALHX0YFX3UGv1ew"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

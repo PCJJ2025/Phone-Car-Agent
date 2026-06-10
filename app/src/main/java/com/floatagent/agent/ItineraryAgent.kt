@@ -106,12 +106,21 @@ object ItineraryAgent {
             val items = result.getJSONArray("itinerary")
             val steps = (0 until items.length()).map {
                 val item = items.getJSONObject(it)
+                val name = item.getString("placeName")
+                // 名称匹配：精确匹配优先，失败则尝试子串匹配（应对 Claude 输出名称略有出入）
+                val matched = savedPlaces.firstOrNull { it.name == name }
+                    ?: savedPlaces.firstOrNull { it.name.contains(name) || name.contains(it.name) }
+                Log.d(
+                    TAG,
+                    "步骤 \"$name\" → " +
+                        (matched?.let { "匹配[${it.name}] coords=${it.lat},${it.lng}" } ?: "未匹配收藏")
+                )
                 ItineraryStep(
-                    placeName = item.getString("placeName"),
+                    placeName = name,
                     activity = item.getString("activity"),
                     estimatedDuration = item.getInt("estimatedDuration"),
                     arrivalTime = item.getString("arrivalTime"),
-                    place = savedPlaces.firstOrNull { p -> p.name == item.getString("placeName") }
+                    place = matched
                 )
             }
 

@@ -163,7 +163,7 @@ object CollectionAgent {
             }
 
             规则：
-            1. 如果是榜单、地图、合集帖子，把每一家明确出现的店分别写进 places。
+            1. 如果是榜单、地图、合集帖子，把帖子明确提到的所有店铺/场所都写进 places（按帖子出现顺序），不要遗漏。
             2. 只提取明确的门店或场所，不要提取菜名、作者名、评论、城市标签。
             3. 如果没有明确店名或场所名，found 返回 false，places 返回空数组。
             4. 不要猜测图片外或屏幕外的信息。
@@ -188,7 +188,7 @@ object CollectionAgent {
 
         val body = JSONObject().apply {
             put("model", "claude-sonnet-4-6")
-            put("max_tokens", 800)
+            put("max_tokens", 6000)
             put("messages", JSONArray().apply {
                 put(JSONObject().apply {
                     put("role", "user")

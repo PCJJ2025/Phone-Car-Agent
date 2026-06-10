@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
 }
 
 // 从 local.properties 读取密钥（该文件不纳入版本控制）
@@ -58,4 +59,13 @@ dependencies {
 
     // 协程
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+
+    // Firebase：手机↔车机的路线云端中转
+    // 注意：BoM 34.x 用 Kotlin 2.x 编译，与本项目 Kotlin 1.9.23 不兼容；
+    // 锁定 33.1.2（Kotlin 1.9 编译）。将来升级项目 Kotlin 后可再升 BoM。
+    implementation platform('com.google.firebase:firebase-bom:33.1.2')
+    implementation 'com.google.firebase:firebase-firestore'  // Trip 文档存储 + 实时监听（已含 KTX 扩展）
+    implementation 'com.google.firebase:firebase-auth'       // 匿名登录（鉴权）
+    // 让 Firestore 监听器能直接 await（配合协程）
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3'
 }

@@ -25,6 +25,7 @@ import com.floatagent.analyzer.GaodeSearcher
 import com.floatagent.model.Category
 import com.floatagent.model.SavedPlace
 import com.floatagent.storage.CollectionStorage
+import com.floatagent.sync.TripRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,6 +44,7 @@ class ItineraryActivity : AppCompatActivity() {
     private lateinit var etEnd: EditText
     private lateinit var btnPlan: Button
     private lateinit var btnRouteMap: Button
+    private lateinit var btnSendCar: Button
     private lateinit var tvResult: TextView
     private lateinit var weatherScroll: View
     private lateinit var weatherBar: LinearLayout
@@ -66,6 +68,7 @@ class ItineraryActivity : AppCompatActivity() {
         etEnd = findViewById(R.id.etEnd)
         btnPlan = findViewById(R.id.btnPlan)
         btnRouteMap = findViewById(R.id.btnRouteMap)
+        btnSendCar = findViewById(R.id.btnSendCar)
         tvResult = findViewById(R.id.tvResult)
         weatherScroll = findViewById(R.id.weatherScroll)
         weatherBar = findViewById(R.id.weatherBar)
@@ -86,6 +89,31 @@ class ItineraryActivity : AppCompatActivity() {
                 startActivity(Intent(this, RouteMapActivity::class.java).putExtra("stops", it))
             }
         }
+        btnSendCar.setOnClickListener { sendToCar() }
+    }
+
+    /** 生成配对码，把当前路线上传到云端，弹窗显示配对码供车机端连接 */
+    private fun sendToCar() {
+        val stops = routeStopsJson ?: return
+        val pairCode = TripRepository.newPairCode()
+        btnSendCar.isEnabled = false
+        btnSendCar.text = "正在发送…"
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                withContext(Dispatchers.IO) { TripRepository.uploadTrip(pairCode, stops) }
+                androidx.appcompat.app.AlertDialog.Builder(this@ItineraryActivity)
+                    .setTitle("已发送到云端")
+                    .setMessage("在车机端「车机模式」输入配对码：\n\n$pairCode\n\n车机连接后会显示完整路线，可逐点推进。")
+                    .setPositiveButton("知道了", null)
+                    .show()
+            } catch (e: Exception) {
+                tvResult.visibility = View.VISIBLE
+                tvResult.text = "发送失败：${e.message}"
+            } finally {
+                btnSendCar.isEnabled = true
+                btnSendCar.text = "发送到车机 🚗"
+            }
+        }
     }
 
     private fun doPlan() {
@@ -104,6 +132,7 @@ class ItineraryActivity : AppCompatActivity() {
 
         btnPlan.isEnabled = false
         btnRouteMap.visibility = View.GONE
+        btnSendCar.visibility = View.GONE
         tvResult.visibility = View.VISIBLE
         tvResult.text = "正在规划行程..."
 
@@ -142,18 +171,30 @@ class ItineraryActivity : AppCompatActivity() {
     ) {
         val stops = JSONArray()
         fun add(name: String, lat: Double, lng: Double, kind: String) {
-            if (lat == 0.0 && lng == 0.0) return
+            if (lat == 0.0 && lng == 0.0) {
+                android.util.Log.w("FloatAgent_Itinerary", "跳过点 $name ($kind)：坐标为 0")
+                return
+            }
             stops.put(JSONObject().put("name", name).put("lat", lat).put("lng", lng).put("kind", kind))
+            android.util.Log.d("FloatAgent_Itinerary", "加入点 $name ($kind) at $lat,$lng")
         }
         add(startLabel, start.first, start.second, "start")
         result.steps.forEach { step ->
-            step.place?.let { add(it.name, it.lat, it.lng, "waypoint") }
+            if (step.place == null) {
+                android.util.Log.w(
+                    "FloatAgent_Itinerary",
+                    "跳过途经点 ${step.placeName}：未匹配到收藏（agent 输出的名称对不上）"
+                )
+                return@forEach
+            }
+            add(step.place.name, step.place.lat, step.place.lng, "waypoint")
         }
         add(endLabel, end.first, end.second, "end")
 
         if (stops.length() >= 2) {
             routeStopsJson = stops.toString()
             btnRouteMap.visibility = View.VISIBLE
+            btnSendCar.visibility = View.VISIBLE
         }
     }
 

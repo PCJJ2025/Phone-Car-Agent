@@ -46,6 +46,10 @@
             android:exported="false"
             android:label="规划路线" />
 
+        <activity android:name=".CarReceiverActivity"
+            android:exported="false"
+            android:label="车机模式" />
+
         <activity android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
